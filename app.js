@@ -13,7 +13,7 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 
 var FACEBOOK_APP_ID = '1391291127857476';
 var FACEBOOK_APP_SECRET = '4a671bc3e28583771f379bf785e9dab9';
-var CALLBACK_URL = 'http://genericapp.herokuapp.com/auth/facebook/callback';
+var CALLBACK_URL = 'http://localhost/auth/facebook/callback';
 
 
 var mongoUrl = 'mongodb://dpapp01:test123test@ds045021.mongolab.com:45021/dpapp';
@@ -47,20 +47,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // parses cookies
 app.use(cookieParser());
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    console.log(err.message);
-});
 
 // set the port number
 app.set('port', (process.env.PORT || 5000));
@@ -101,6 +87,11 @@ app.get('/login', function(req, res){
   res.send('hello world');
 });
 
+// handle request to login page
+app.get('/', function(req, res){
+  res.send('hello world');
+});
+
 // logs the user out and renders the main page
 app.get('/logout', function(req, res){
     delete req.session.username;
@@ -130,6 +121,20 @@ app.post('/login', function(req, res){
       res.render('signup.html');
     }
   });
+});
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    console.log(err.message);
 });
 
 // connect to the database
