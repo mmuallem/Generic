@@ -7,6 +7,10 @@ var mongo = require('./mongo');
 var userModel = require('./schemas/user_schema');
 var teamModel = require('./schemas/team_schema');
 var mongoose = require('mongoose');
+var busboy = require('connect-busboy');
+
+var HOST = '115.29.10.169';
+var PORT = '5000';
 
 var request  = require('request');
 
@@ -27,7 +31,7 @@ app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
 
 // Use this so we can get access to `req.body` in login ad signup forms.
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false}));
 
 // We need to use cookies for sessions, so use the cookie parser middleware
 app.use( require('cookie-parser')() );
@@ -38,9 +42,12 @@ app.use(bodyParser.json());
 // parses cookies
 app.use(cookieParser());
 
+app.use(busboy());
+
 // set the port number
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
+
 
 /**********************************************************************************/
 
@@ -57,8 +64,22 @@ app.get('/logout', function(req, res){
 
 app.get('/trigger', function(req, res) {
   /**********************************************/
-  res.render('createTeam.html');
+  res.render('saveImage.html');
   /**********************************************/
+});
+
+//create new user
+app.post('/save/image', function(req, res) {
+  var fstream;
+  req.pipe(req.busboy);
+  req.busboy.on('file', function (fieldname, file, filename) {
+      console.log("Uploading: " + filename); 
+      fstream = fs.createWriteStream(__dirname + '/public/images/' + filename);
+      file.pipe(fstream);
+      fstream.on('close', function () {
+          res.json('http://' + HOST + ':' + PORT + '/images/' + filename);
+      });
+  });
 });
 
 //create new user
