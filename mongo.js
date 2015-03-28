@@ -1,10 +1,10 @@
-var MongoClient = require('mongodb').MongoClient;
+var mongoose = require('mongoose');
 var db;
 var connected = false;
 
 module.exports = {
   connect: function(url, callback){
-    MongoClient.connect(url, function(err, _db){
+    mongoose.connect(url, function(err, _db){
       if (err) { throw new Error('Could not connect: '+err); }
       
       db = _db;
@@ -12,12 +12,5 @@ module.exports = {
       
       callback(db);
     });
-  },
-  collection: function(name){
-    if (!connected) {
-      throw new Error('Must connect to Mongo before calling "collection"');
-    }
-    
-    return db.collection(name);
   }
 };
