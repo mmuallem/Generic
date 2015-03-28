@@ -69,10 +69,13 @@ app.get('/trigger', function(req, res) {
 });
 
 //create new user
-app.get('/create/user', function(req, res) {
+app.get('/login', function(req, res) {
   getFacebookId(req.query.access_token, function(user_name, user_id, picture_url) {
-    createUser(user_name, user_id, picture_url);
+    createUser(user_name, user_id, picture_url, function(success){
+      if(success) res.json({userId: user_id});
+    });
   });
+});
 
 app.post('/create/team', function(req, res) {
   var fstream;
@@ -150,6 +153,15 @@ app.get('/joinTeam', function(req, res) {
   });
 });
 
+// handles request to create a new event
+app.post('createEvent', function(req, res) {
+  
+  var eventName = req.body.name;
+  var date = red.body.date;
+  var teamId = req.body.team_id;
+  var userId = req.body.user_id;
+
+});
 /**********************************************************************************/
 
 
@@ -186,7 +198,7 @@ function createTeam(team_name, user_id, image_url, callback){
 
 };
 
-function createUser(user_name, user_id, picture_url) {
+function createUser(user_name, user_id, picture_url, callback) {
   var newUser = new userModel({
     _id: user_id,
     name: user_name,
@@ -196,6 +208,7 @@ function createUser(user_name, user_id, picture_url) {
   newUser.save(function (err) {
     if (err) throw err;
     console.log('user created');
+    callback(true);
   });
 };
 
