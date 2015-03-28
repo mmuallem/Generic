@@ -95,6 +95,14 @@ app.get('/loginSuccess', function(req, res) {
   console.log('received it!!!');
 });
 
+app.get('/team/search', function(req, res) {
+  console.log(req);
+});
+
+app.get('/search', function(req, res) {
+  console.log('received it!!!');
+});
+
 /**********************************************************************************/
 // handle request for requests when one is logged in
 app.get('/login', function(req, res){
@@ -107,7 +115,6 @@ app.get('/login', function(req, res){
 /**********************************************************************************/
 
 function getFacebookId(access_token, callback) {
-  console.log('getting facebook id');
   request('https://graph.facebook.com/me?access_token=' + access_token, function (err, res, body) {
     if(!err && res.statusCode == 200) {
       var obj = JSON.parse(res.body);
