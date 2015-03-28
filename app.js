@@ -97,7 +97,7 @@ app.get('/loginSuccess', function(req, res) {
 
 /**********************************************************************************/
 // handle request for requests when one is logged in
-app.get('/login', function(req, res){
+/*app.get('/login', function(req, res){
   console.log(port);
   getFacebookId(req.access_token, function(user_id) {
     getFacebookPicture(user_id, function(picture_url) {
@@ -110,10 +110,10 @@ app.get('/login', function(req, res){
   request.post('http://graph.facebook.com', {form:{key:'value'}})
 
 
-  */
+  
   //
   console.log(req.body);
-});
+});*/
 
 /**********************************************************************************/
 
@@ -121,7 +121,7 @@ function getFacebookId(access_token, callback) {
   request('http://graph.facebook/me?access_token=' + access_token, function (error, response, body) {
     if(!error && response.statusCode == 200) {
       console.log(body);
-      callback(body.user_id,);
+      callback(body.user_id);
     }
   });
 };
