@@ -97,46 +97,33 @@ app.get('/loginSuccess', function(req, res) {
 
 /**********************************************************************************/
 // handle request for requests when one is logged in
-/*app.get('/login', function(req, res){
-  console.log(port);
-  getFacebookId(req.access_token, function(user_id) {
-    getFacebookPicture(user_id, function(picture_url) {
-      createUser(user_id, picture_url, function() {
-        res.send('Ok');//---------->what type of data do we want to send back
-      });
-    });
+app.get('/login', function(req, res){
+  getFacebookId('CAATxa5xlQSABACs5ylv29hi5Dddt26SCA24MQwimnj0rPf9Q5pQu5gYxPSyUSwLkYjqUYDm5SsKahv4HhZCztz1qKwxRUKOffT7A8knkQ67elBSRqYfCEsQ0dzSGZBTje6DO7KLwR9V82gCAaThhDvSfKDTz1tgKyKpDYYgjdFfNub4c6JwarLaXY7uDNZBc1u67Byurq1kfvOIqMM5', function(user_id) {
+    getFacebookPicture(user_id);
   });
-  /*
-  request.post('http://graph.facebook.com', {form:{key:'value'}})
-
-
-  
-  //
   console.log(req.body);
-});*/
+});
 
 /**********************************************************************************/
 
 function getFacebookId(access_token, callback) {
-  request('http://graph.facebook/me?access_token=' + access_token, function (error, response, body) {
-    if(!error && response.statusCode == 200) {
-      console.log(body);
-      callback(body.user_id);
+  console.log('getting facebook id');
+  request('https://graph.facebook.com/me?access_token=' + access_token, function (err, res, body) {
+    if(!err && res.statusCode == 200) {
+      var obj = JSON.parse(res.body);
+      console.log(obj);
+      callback(obj.id);
     }
   });
 };
 
-function getFacebookPicture(user_id, callback) {
-  request('http://graph.facebook/v2.3/' + user_id + '/picture', function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      console.log(body);
-      callback(user_id, response.body.picture_url);
-    }
-  });
+function getFacebookPicture(user_id) { 
+  createUser(user_id, 'https://graph.facebook.com/v2.2/' + user_id + '/picture');
 };
 
-function createUser(user_id, picture_url, callback) {
-  mongoose.createUser(user_id, picture_url, callback());
+function createUser(user_id, picture_url) {
+  //mongoose.createUser(user_id, picture_url, callback());
+  console.log(user_id + ', ' + picture_url);
 };
 
 /**********************************************************************************/
@@ -165,4 +152,3 @@ mongo.connect(mongoUrl, function(){
     console.log('Server is listening on port: ' + app.get('port'));
   });  
 });
-
