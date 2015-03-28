@@ -64,11 +64,16 @@ app.get('/logout', function(req, res){
 
 app.get('/trigger', function(req, res) {
   /**********************************************/
-  res.render('saveImage.html');
+  res.render('addUserToTeam.html');
   /**********************************************/
 });
 
 //create new user
+app.get('/create/user', function(req, res) {
+  getFacebookId(req.query.access_token, function(user_name, user_id, picture_url) {
+    createUser(user_name, user_id, picture_url);
+  });
+
 app.post('/save/image', function(req, res) {
   var fstream;
   req.pipe(req.busboy);
@@ -82,57 +87,74 @@ app.post('/save/image', function(req, res) {
   });
 });
 
-//create new user
-app.post('/create/user', function(req, res) {
-  console.log(req.body.user_name);
-  console.log(req.body.user_id);
-  console.log(req.body.user_picture_url);
-  res.send('ok');
-});
-
 //create new team
-app.post('/create/team', function(req, res) {
-  createTeam(req.body.team_name.toLowerCase(), req.body.team_id, req.body.team_picture_url, function(team){
+app.get('/create/team', function(req, res) {
+  createTeam(req.query.team_name.toLowerCase(), req.query.user_id, req.query.team_picture, function(team){
     res.json(team);
   });
 
 });
 
 //search existing user
-app.post('/search/user', function(req, res) {
-  console.log(req.body.user_name);
-  res.send('ok');
+app.get('/search/user', function(req, res) {
+  var userName = req.query.user_name; 
+  console.log(userName);
+  var regex = new RegExp(userName, 'i');
+  // get all the team names sorted alphabetically 
+  userModel.find({name: { $regex: regex }}, function(err, user) {
+    if (err) throw err;
+    res.json(user);
+  });
 });
 
 //search existing team
-app.post('/search/team', function(req, res) {
-  console.log(req.body.team_name);
-  res.send('ok');
+app.get('/search/team', function(req, res) {
+  var teamName = req.query.team_name;
+  console.log('search Team', teamName);
+  if(teamName){
+    // get the team specified
+    var regex = new RegExp(teamName, 'i');
+    teamModel.findOne({name: { $regex: regex }}, function(err, team) {
+      if (err) throw err;
+      res.json(team);
+    });
+  }
+  else{
+    // get all the team names sorted alphabetically 
+    teamModel.find({}, function(err, teams) {
+      if (err) throw err;
+      res.json(teams);
+    });
+  }
 });
 
 //add user to team
-app.post('/addUserToTeam', function(req, res) {
-  console.log(req.body.user_id);
-  console.log(req.body.team_id);
-  res.send('ok');
+app.get('/addUserToTeam', function(req, res) {
+  var userId = req.query.user_id;
+  var teamId = req.query.team_id;
+
+  // get all the team names sorted alphabetically 
+  teamModel.findOneAndUpdate({_id: teamId}, {$push: {userIds: userId}, $pull: {userRequestsIds: userId}}, function(err, team) {
+    if (err) throw err;
+    res.json({success: true});
+  });
 });
 
 //ask to join a team
-app.post('/joinTeam', function(req, res) {
-  console.log(req.body.user_id);
-  console.log(req.body.team_id);
-  res.send('ok');
+app.get('/joinTeam', function(req, res) {
+ 
+  var userId = req.query.user_id;
+  var teamId = req.query.team_id;
+
+  // get all the team names sorted alphabetically 
+  teamModel.findOneAndUpdate({_id: teamId}, {$push: {userRequestsIds: userId}}, function(err, team) {
+    if (err) throw err;
+    res.json({success: true});
+  });
 });
 
 /**********************************************************************************/
 
-app.get('/loginSuccess', function(req, res) {
-  console.log(req.query.access_token);
-  res.send('200');
-  getFacebookId(req.query.access_token, function(user_name, user_id, picture_url) {
-    createUser(user_name, user_id, picture_url);
-  });
-});
 
 /**********************************************************************************/
 
@@ -151,7 +173,6 @@ function getFacebookId(access_token, callback) {
 * Creates team and adds it to DB
 */
 function createTeam(team_name, user_id, picture, callback){
-
   // process image
   // upload to imgur
   // get url
@@ -161,9 +182,9 @@ function createTeam(team_name, user_id, picture, callback){
     name: team_name,
     imageUrl: picture_url,
     userIds: [user_id],
-    userRequestsIds: null,
-    eventIds: null,
-    messages: null
+    userRequestsIds: [],
+    eventIds: [],
+    messages: []
   });
   newTeam.save(function (err) {
     if (err) throw err;
