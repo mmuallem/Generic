@@ -98,8 +98,8 @@ app.get('/loginSuccess', function(req, res) {
 /**********************************************************************************/
 // handle request for requests when one is logged in
 app.get('/login', function(req, res){
-  getFacebookId('CAATxa5xlQSABACs5ylv29hi5Dddt26SCA24MQwimnj0rPf9Q5pQu5gYxPSyUSwLkYjqUYDm5SsKahv4HhZCztz1qKwxRUKOffT7A8knkQ67elBSRqYfCEsQ0dzSGZBTje6DO7KLwR9V82gCAaThhDvSfKDTz1tgKyKpDYYgjdFfNub4c6JwarLaXY7uDNZBc1u67Byurq1kfvOIqMM5', function(user_id) {
-    getFacebookPicture(user_id);
+  getFacebookId('CAATxa5xlQSABACs5ylv29hi5Dddt26SCA24MQwimnj0rPf9Q5pQu5gYxPSyUSwLkYjqUYDm5SsKahv4HhZCztz1qKwxRUKOffT7A8knkQ67elBSRqYfCEsQ0dzSGZBTje6DO7KLwR9V82gCAaThhDvSfKDTz1tgKyKpDYYgjdFfNub4c6JwarLaXY7uDNZBc1u67Byurq1kfvOIqMM5', function(user_id, picture_url) {
+    createUser(user_id, picture_url);
   });
   console.log(req.body);
 });
@@ -111,14 +111,9 @@ function getFacebookId(access_token, callback) {
   request('https://graph.facebook.com/me?access_token=' + access_token, function (err, res, body) {
     if(!err && res.statusCode == 200) {
       var obj = JSON.parse(res.body);
-      console.log(obj);
-      callback(obj.id);
+      callback(obj.id, 'https://graph.facebook.com/v2.2/' + obj.id + '/picture');
     }
   });
-};
-
-function getFacebookPicture(user_id) { 
-  createUser(user_id, 'https://graph.facebook.com/v2.2/' + user_id + '/picture');
 };
 
 function createUser(user_id, picture_url) {
