@@ -25,6 +25,15 @@ var app = express();
 // logger
 app.use(logger('dev'));
 
+// set the default view engine
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+
+
+// Set the default rendering engine for normal html files
+app.engine('html', require('ejs').renderFile);
+
+
 // Use this so we can get access to `req.body` in login ad signup forms.
 app.use(bodyParser.urlencoded({ extended: false }));
 
