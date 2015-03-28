@@ -74,25 +74,22 @@ app.get('/create/user', function(req, res) {
     createUser(user_name, user_id, picture_url);
   });
 
-app.post('/save/image', function(req, res) {
+app.post('/create/team', function(req, res) {
   var fstream;
+  var imageUrl;
   req.pipe(req.busboy);
   req.busboy.on('file', function (fieldname, file, filename) {
       console.log("Uploading: " + filename); 
       fstream = fs.createWriteStream(__dirname + '/public/images/' + filename);
       file.pipe(fstream);
       fstream.on('close', function () {
-          res.json('http://' + HOST + ':' + PORT + '/images/' + filename);
+          imageUrl = 'http://' + HOST + ':' + PORT + '/images/' + filename;
+
+          createTeam(req.body.team_name.toLowerCase(), req.body.user_id, imageUrl, function(team){
+            res.json(team);
+          });
       });
   });
-});
-
-//create new team
-app.get('/create/team', function(req, res) {
-  createTeam(req.query.team_name.toLowerCase(), req.query.user_id, req.query.team_picture, function(team){
-    res.json(team);
-  });
-
 });
 
 //search existing user
@@ -172,15 +169,11 @@ function getFacebookId(access_token, callback) {
 /**
 * Creates team and adds it to DB
 */
-function createTeam(team_name, user_id, picture, callback){
-  // process image
-  // upload to imgur
-  // get url
-  picture_url = '';
+function createTeam(team_name, user_id, image_url, callback){
 
   var newTeam = new teamModel({
     name: team_name,
-    imageUrl: picture_url,
+    imageUrl: image_url,
     userIds: [user_id],
     userRequestsIds: [],
     eventIds: [],
