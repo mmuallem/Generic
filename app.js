@@ -6,6 +6,7 @@ var logger = require('morgan');
 var mongo = require('./mongo');
 var userModel = require('./schemas/user_schema');
 var teamModel = require('./schemas/team_schema');
+var eventModel = require('./schemas/event_schema');
 var mongoose = require('mongoose');
 var busboy = require('connect-busboy');
 
@@ -64,7 +65,7 @@ app.get('/logout', function(req, res){
 
 app.get('/trigger', function(req, res) {
   /**********************************************/
-  res.render('addUserToTeam.html');
+  res.render('searchEvents.html');
   /**********************************************/
 });
 
@@ -154,14 +155,30 @@ app.get('/joinTeam', function(req, res) {
 });
 
 // handles request to create a new event
-app.post('createEvent', function(req, res) {
+app.get('/create/event', function(req, res) {
   
-  var eventName = req.body.name;
-  var date = red.body.date;
-  var teamId = req.body.team_id;
-  var userId = req.body.user_id;
+  console.log(req.query.event_name);
 
+  var eventName = req.query.event_name;
+  var date = req.query.date;
+  var teamId = req.query.team_id;
+  var userId = req.query.user_id;
+
+  createEvent(eventName, userId, teamId, date, function(newEvent){
+    res.json(newEvent);
+  });
 });
+
+// handles request to retrieve all events
+app.get('/search/events', function(req, res) {
+  
+  eventModel.find({}, null, {sort: {date: -1}}, function(err, events) {
+    if (err) throw err;
+      res.json(events);
+  });
+});
+
+
 /**********************************************************************************/
 
 
@@ -195,9 +212,32 @@ function createTeam(team_name, user_id, image_url, callback){
     if (err) throw err;
     callback(newTeam);
   });
-
 };
 
+/**
+* Creates events and adds it to DB
+*/
+function createEvent(eventName, user_id, team_id, date, callback){
+
+  var newEvent = new eventModel({
+    name: eventName,
+    date: date,
+    initiator_team_id: team_id,
+    location: '',
+    confirmed: false,
+    participants: [user_id],
+    participant_team_id: null,
+  });
+
+  newEvent.save(function (err) {
+    if (err) throw err;
+    callback(newEvent);
+  });
+};
+
+/**
+* Creates events and adds it to DB
+*/
 function createUser(user_name, user_id, picture_url, callback) {
   var newUser = new userModel({
     _id: user_id,

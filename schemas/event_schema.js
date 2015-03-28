@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
 var eventSchema = mongoose.Schema({
 	name: String,
@@ -8,7 +9,7 @@ var eventSchema = mongoose.Schema({
     dateOfCreation: {type: Date, default: Date.now},
     initiator_team_id: {type: Schema.Types.ObjectId, ref: 'teamSchema'},
     participant_team_id: {type: Schema.Types.ObjectId, ref: 'teamSchema'},
-    participants: [{type: Schema.Types.ObjectId, ref: 'userSchema'}]
+    participants: [{type: Number, ref: 'userSchema'}]
 });
 
 module.exports = mongoose.model('eventSchema', eventSchema);
