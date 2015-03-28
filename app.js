@@ -138,18 +138,10 @@ app.post('/joinTeam', function(req, res) {
 
 /**********************************************************************************/
 
-app.post('/loginSuccess', function(req, res) {
-  console.log('received it!!!');
-  console.log(req.body);
+app.get('/loginSuccess', function(req, res) {
+  console.log(req.query.access_token);
   res.send('200');
-});
-
-/**********************************************************************************/
-// handle request for requests when one is logged in
-app.get('/login', function(req, res){
-  console.log(req.body);
-  res.send(req);
-  getFacebookId('CAATxa5xlQSABACs5ylv29hi5Dddt26SCA24MQwimnj0rPf9Q5pQu5gYxPSyUSwLkYjqUYDm5SsKahv4HhZCztz1qKwxRUKOffT7A8knkQ67elBSRqYfCEsQ0dzSGZBTje6DO7KLwR9V82gCAaThhDvSfKDTz1tgKyKpDYYgjdFfNub4c6JwarLaXY7uDNZBc1u67Byurq1kfvOIqMM5', function(user_name, user_id, picture_url) {
+  getFacebookId(req.query.access_token, function(user_name, user_id, picture_url) {
     createUser(user_name, user_id, picture_url);
   });
 });
@@ -160,6 +152,7 @@ function getFacebookId(access_token, callback) {
   request('https://graph.facebook.com/me?access_token=' + access_token, function (err, res, body) {
     if(!err && res.statusCode == 200) {
       var obj = JSON.parse(res.body);
+      console.log('fb id: ', obj.id);
       callback(obj.name, obj.id, 'https://graph.facebook.com/v2.2/' + obj.id + '/picture');
     }
   });
