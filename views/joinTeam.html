@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		
 	</head>
 	<body>
-		<form action='/team/search' method='get'>
-			<input type='text' name='name'>
+		<p>
+			Join team.
+		</p>
+		<form action='/joinTeam' method='post'>
+			<input type='text' name='user_id' placeholder='user id'>
+			<input type='text' name='team_id' placeholder='team id'>
 			<input type='submit'>
 		</form>
 	</body>

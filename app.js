@@ -40,12 +40,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // We need to use cookies for sessions, so use the cookie parser middleware
 app.use( require('cookie-parser')() );
 
-
 // handles json parsing
 app.use(bodyParser.json());
-
-// parses html body
-app.use(bodyParser.urlencoded({ extended: false }));
 
 // parses cookies
 app.use(cookieParser());
@@ -92,34 +88,55 @@ app.get('/logout', function(req, res){
     res.redirect('/');
 });
 
-app.get('/create/user', function(req, res) {
-  console.log(req.body);
-  res.render('createUser.html');
-});
-
-app.get('/create/team', function(req, res) {
-  res.render('createTeam.html');
-});
-
-app.get('/search/user', function(req, res) {
-  res.render('searchUser.html');
-});
-
-app.get('/search/team', function(req, res) {
-  res.render('searchTeam.html');
-});
-
-app.get('/addUserToTeam', function(req, res) {
-  res.render('addUserToTeam.html');
-});
-
-app.get('/joinTeam', function(req, res) {
+app.get('/trigger', function(req, res) {
+  /**********************************************/
   res.render('joinTeam.html');
+  /**********************************************/
 });
 
-app.get('/search', function(req, res) {
-  console.log('received it!!!');
+//create new user
+app.post('/create/user', function(req, res) {
+  console.log(req.body.user_name);
+  console.log(req.body.user_id);
+  console.log(req.body.user_picture_url);
+  res.send('ok');
 });
+
+//create new team
+app.post('/create/team', function(req, res) {
+  console.log(req.body.team_name);
+  console.log(req.body.team_id);
+  console.log(req.body.team_picture_url);
+  res.send('ok');
+});
+
+//search existing user
+app.post('/search/user', function(req, res) {
+  console.log(req.body.user_name);
+  res.send('ok');
+});
+
+//search existing team
+app.post('/search/team', function(req, res) {
+  console.log(req.body.team_name);
+  res.send('ok');
+});
+
+//add user to team
+app.post('/addUserToTeam', function(req, res) {
+  console.log(req.body.user_id);
+  console.log(req.body.team_id);
+  res.send('ok');
+});
+
+//ask to join a team
+app.post('/joinTeam', function(req, res) {
+  console.log(req.body.user_id);
+  console.log(req.body.team_id);
+  res.send('ok');
+});
+
+/**********************************************************************************/
 
 app.get('/loginSuccess', function(req, res) {
   console.log('received it!!!');
