@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var logger = require('morgan');
 var mongo = require('./mongo');
 var userModel = require('./schemas/user_schema');
+var teamModel = require('./schemas/team_schema');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
@@ -90,7 +91,7 @@ app.get('/logout', function(req, res){
 
 app.get('/trigger', function(req, res) {
   /**********************************************/
-  res.render('joinTeam.html');
+  res.render('createTeam.html');
   /**********************************************/
 });
 
@@ -104,10 +105,10 @@ app.post('/create/user', function(req, res) {
 
 //create new team
 app.post('/create/team', function(req, res) {
-  console.log(req.body.team_name);
-  console.log(req.body.team_id);
-  console.log(req.body.team_picture_url);
-  res.send('ok');
+  createTeam(req.body.team_name.toLowerCase(), req.body.team_id, req.body.team_picture_url, function(team){
+    res.json(team);
+  });
+
 });
 
 //search existing user
@@ -158,6 +159,32 @@ function getFacebookId(access_token, callback) {
   });
 };
 
+
+/**
+* Creates team and adds it to DB
+*/
+function createTeam(team_name, user_id, picture, callback){
+
+  // process image
+  // upload to imgur
+  // get url
+  picture_url = '';
+
+  var newTeam = new teamModel({
+    name: team_name,
+    imageUrl: picture_url,
+    userIds: [user_id],
+    userRequestsIds: null,
+    eventIds: null,
+    messages: null
+  });
+  newTeam.save(function (err) {
+    if (err) throw err;
+    callback(newTeam);
+  });
+
+};
+
 function createUser(user_name, user_id, picture_url) {
   var newUser = new userModel({
     _id: user_id,
@@ -167,7 +194,7 @@ function createUser(user_name, user_id, picture_url) {
   });
   newUser.save(function (err) {
     if (err) throw err;
-    console.log('meow');
+    console.log('user created');
   });
 };
 
