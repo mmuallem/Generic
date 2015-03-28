@@ -133,7 +133,7 @@ app.get('/login', function(req, res){
   /*getFacebookId('CAATxa5xlQSABACs5ylv29hi5Dddt26SCA24MQwimnj0rPf9Q5pQu5gYxPSyUSwLkYjqUYDm5SsKahv4HhZCztz1qKwxRUKOffT7A8knkQ67elBSRqYfCEsQ0dzSGZBTje6DO7KLwR9V82gCAaThhDvSfKDTz1tgKyKpDYYgjdFfNub4c6JwarLaXY7uDNZBc1u67Byurq1kfvOIqMM5', function(user_name, user_id, picture_url) {
     createUser(user_name, user_id, picture_url);
   });*/
-  res.send(req.body);
+  res.send(req);
 });
 
 /**********************************************************************************/
