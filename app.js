@@ -92,16 +92,38 @@ app.get('/logout', function(req, res){
     res.redirect('/');
 });
 
-app.get('/loginSuccess', function(req, res) {
-  console.log('received it!!!');
+app.get('/create/user', function(req, res) {
+  console.log(req.body);
+  res.render('createUser.html');
 });
 
-app.get('/team/search', function(req, res) {
-  console.log(req);
+app.get('/create/team', function(req, res) {
+  res.render('createTeam.html');
+});
+
+app.get('/search/user', function(req, res) {
+  res.render('searchUser.html');
+});
+
+app.get('/search/team', function(req, res) {
+  res.render('searchTeam.html');
+});
+
+app.get('/addUserToTeam', function(req, res) {
+  res.render('addUserToTeam.html');
+});
+
+app.get('/joinTeam', function(req, res) {
+  res.render('joinTeam.html');
 });
 
 app.get('/search', function(req, res) {
   console.log('received it!!!');
+});
+
+app.get('/loginSuccess', function(req, res) {
+  console.log('received it!!!');
+  res.send('200');
 });
 
 /**********************************************************************************/
