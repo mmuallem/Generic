@@ -1,0 +1,86 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css	">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.12.2/react-with-addons.js"></script>
+	
+		<style>
+			.left-bar {
+				margin-top: 5%;
+				margin-left: 25%;
+				width: 50%;
+			}
+			.root {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script>
+
+		var appComponent = React.createClass({
+
+			render: function(){
+				var homePageStyle = {
+				backgroundImage:  'url(' + "http://cdn.elegantthemes.com/blog/wp-content/uploads/2013/09/bg-11-full.jpg" +')'
+				}
+
+				return React.createElement('div', {className: "root", style: homePageStyle},
+					React.createElement('div', { className: 'col-sm-8 left-bar'},
+						React.createElement(formComponent, null)
+					)
+			)}
+		});
+
+
+		var formComponent = React.createClass({
+			render: function(){
+
+				return React.createElement('div', { className: 'col-md-12' },
+					React.createElement('div', {className: "col-md-6 col-md-offset-4"},
+						React.createElement('h2', null, "Welcome Back!")
+					),
+					React.createElement('form', {action: '/login', role: 'form', method: 'POST', className: "form-horizontal"},
+						React.createElement('div', {className: 'col-md-10 col-md-offset-1'},
+							React.createElement('div', {className: "form-group"},
+								React.createElement('label', {
+									className: "col-sm-3 control-label"
+									},
+									"Username"
+								),
+								React.createElement('div', {className: "col-sm-8"},
+									React.createElement('input', {type: "text", className: "form-control",
+										name: "username", placeholder: "Username"})
+								)
+							),
+									
+							React.createElement('div', {className: "form-group"},					
+								React.createElement('label', {
+									className: "col-sm-3 control-label"
+									},
+									"Password"
+								),
+								React.createElement('div', {className: "col-sm-8"},
+									React.createElement('input', {type: "password", className: "form-control",
+										name: "password", placeholder: "Password"})
+								)
+							),
+							React.createElement('div', { className: 'col-md-5 col-md-offset-5' },
+								React.createElement('button',
+									{type: 'submit', className: 'btn btn-primary btn-lg'}, 
+									'Login!')
+							)
+						)
+					)
+				)
+			}
+		});
+		
+		var appElement = React.createElement(appComponent, null)
+		React.render(appElement, document.getElementById('root'));
+		</script>
+	</body>
+</html>

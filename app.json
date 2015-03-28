@@ -1,7 +1,6 @@
 {
-  "name": "Node.js Getting Started",
-  "description": "A barebones Node.js app using Express 4",
-  "repository": "https://github.com/heroku/node-js-getting-started",
-  "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "name": "Generic",
+  "description": "An Andriod football matching app",
+  "repository": "https://github.com/mmuallem/Generic",
   "keywords": ["node", "express", "static"]
 }

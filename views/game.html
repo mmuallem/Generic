@@ -1,0 +1,150 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.12.2/react-with-addons.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+		<style>
+			.textbar {
+				color: #003319;
+				margin-left: 5%;
+				position: relative;
+				width: 90%; 
+				height: 10%;
+				font-size: 20px;
+				font-family: Arial, Helvetica, sans-serif;
+				text-align: center;
+			}
+			.root {
+				width: 100%;
+				height: 100%;
+				position: fixed;
+			}
+			#container {
+				margin-top: 2%;
+				height: 90%;
+				position: fixed;
+			}
+			#note {
+				padding-left: 10;
+				color: red;
+				font-size: 15px;
+				position: relative;
+			}
+			.panel {
+				position: relative;
+				padding-top: 2%;
+				width: 50%;
+				height: 85%;
+				background-color: transparent;
+				border: 2px solid #003319;
+				}
+			.list {
+				position: relative;
+				margin-left: 5%;
+				text-align: center;
+				height: 85%; width: 90%;
+				background-color: transparent;
+				border: 1px solid #003319;
+			}
+			ul
+			{
+				list-style-type: none;
+				text-align: center;
+				padding: 0;
+			}
+			span
+			{
+				font-size: 40px;
+				font-family: Arial, Helvetica, sans-serif;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="root" class="root"></div>
+		<script>
+
+		// The ul list of words the user tried	
+		var wordList = React.createClass({
+			// returns one instance of a list item 
+			createItem: function(itemText) {
+		      return React.createElement('li', null,
+		      	React.createElement('span', {style:{color: 'red'}, id:'sp0'}, itemText.charAt(0)),
+		      	React.createElement('span', {style:{color: 'red'}, id:'sp1'}, itemText.charAt(1)),
+		      	React.createElement('span', {style:{color: 'red'}, id:'sp2'}, itemText.charAt(2)),
+		      	React.createElement('span', {style:{color: 'red'}, id:'sp3'}, itemText.charAt(3)),
+		      	React.createElement('span', {style:{color: 'red'}, id:'sp4'}, itemText.charAt(4)));
+  			},
+  			// maps the contents of ul to be updated from the contents of the current word list
+		  	render: function() {
+		    return React.createElement('ul', null, this.props.words.map(this.createItem));
+ 			}	
+		});
+
+		var app = React.createClass({
+
+			getInitialState: function() {
+		    	return {words: [], input: '', tries: 0};
+		    },
+
+		    // Method to get JSON from server by page
+		    handleKeyUp: function (event) {
+		    	var ENTER_KEY = 13;
+			    if (event.which === ENTER_KEY) {
+			    	var val = this.state.input.trim();
+					if (val) {
+					    if(val.length != 5){
+					    	document.getElementById('note').innerHTML = "Please input a five letter word only";
+					    	return false;
+					    }
+					    var parameters = { word: val };
+				        $.get('/game/word',parameters, function(data) {
+							
+			     		});
+					    this.state.tries++;
+					    this.updateList(val);
+					}				
+				}
+		    },
+
+		    handleChange: function(event) {
+			    this.setState({input: event.target.value});
+			},
+
+			updateList: function(word) {
+				var newList = this.state.words.concat([word]);
+				this.setState({words: newList, input: ''});
+			},
+
+			render: function(){
+				var homePageStyle = {
+					backgroundImage: 'url(' + "http://cdn.elegantthemes.com/blog/wp-content/uploads/2013/09/bg-11-full.jpg" +')'
+				};
+				var introText = "Welcome to this mastermind game. Please choose one of the following";
+
+				return React.createElement('div', {className: "root", style: homePageStyle},
+					React.createElement('div', {className: "container", id: "container"},
+						React.createElement('div', {className: "row panel col-md-offset-3"},
+							React.createElement('input', {type: "text", className: "form-control textbar", onKeyUp: this.handleKeyUp, value: this.state.input, onChange: this.handleChange}
+							),
+							React.createElement('div', {style:{height: '5%', width: '90%'},
+												id:"note", 
+												className:"note"
+												}
+							),
+							React.createElement('div', {className: "row list col-md-offset-1"},
+								React.createElement(wordList, {words: this.state.words})
+							)
+						)
+					)
+				);
+			}
+		});
+		
+		var appElement = React.createElement(app, null)
+		React.render(appElement, document.getElementById('root'));
+		</script>
+	</body>
+</html>
