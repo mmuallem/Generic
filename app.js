@@ -10,6 +10,7 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 
+var request  = require('request');
 
 var FACEBOOK_APP_ID = '1391291127857476';
 var FACEBOOK_APP_SECRET = '4a671bc3e28583771f379bf785e9dab9';
@@ -27,7 +28,7 @@ var app = express();
 app.use(logger('dev'));
 
 // Use this so we can get access to `req.body` in login ad signup forms.
-app.use( require('body-parser')() );
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // We need to use cookies for sessions, so use the cookie parser middleware
 app.use( require('cookie-parser')() );
@@ -77,15 +78,7 @@ app.get('/auth/facebook/callback',
   passport.authenticate('facebook', { successRedirect: '/',
                                       failureRedirect: '/login' }));
 
-// handle request to signup page
-app.get('/signup', function(req, res){
-  res.render('signup.html');
-});
-
-// handle request to login page
-app.get('/login', function(req, res){
-  res.send('hello world');
-});
+/**********************************************************************************/
 
 // handle request to login page
 app.get('/', function(req, res){
@@ -98,30 +91,55 @@ app.get('/logout', function(req, res){
     res.redirect('/');
 });
 
-// Logs the user in
-// redirects to home page if success
-// or to signup if fails
-app.post('/login', function(req, res){
-  if(req.session.username){
-    res.redirect('/home');
-  }
-  // These two variables come from the form on
-  // the views/login.hbs page
-  var username = req.body.username;
-  var password = req.body.password;
-    
-  authenticateUser(username, password, function(err, user){
-     if (user) {
-      // This way subsequent requests will know the user is logged in.
-        req.session.username = user.username;
+app.get('/loginSuccess', function(req, res) {
+  console.log('received it!!!');
+});
 
-        res.redirect('home.html'); 
-      } else {
-      console.log("error logging in");
-      res.render('signup.html');
+/**********************************************************************************/
+// handle request for requests when one is logged in
+app.get('/login', function(req, res){
+  console.log(port);
+  getFacebookId(req.access_token, function(user_id) {
+    getFacebookPicture(user_id, function(picture_url) {
+      createUser(user_id, picture_url, function() {
+        res.send('Ok');//---------->what type of data do we want to send back
+      });
+    });
+  });
+  /*
+  request.post('http://graph.facebook.com', {form:{key:'value'}})
+
+
+  */
+  //
+  console.log(req.body);
+});
+
+/**********************************************************************************/
+
+function getFacebookId(access_token, callback) {
+  request('http://graph.facebook/me?access_token=' + access_token, function (error, response, body) {
+    if(!error && response.statusCode == 200) {
+      console.log(body);
+      callback(body.user_id,);
     }
   });
-});
+};
+
+function getFacebookPicture(user_id, callback) {
+  request('http://graph.facebook/v2.3/' + user_id + '/picture', function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      console.log(body);
+      callback(user_id, response.body.picture_url);
+    }
+  });
+};
+
+function createUser(user_id, picture_url, callback) {
+  mongoose.createUser(user_id, picture_url, callback());
+};
+
+/**********************************************************************************/
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -137,6 +155,8 @@ app.use(function(err, req, res, next) {
     console.log(err.message);
 });
 
+/**********************************************************************************/
+
 // connect to the database
 // and add a listening port to the applications
 mongo.connect(mongoUrl, function(){
@@ -145,3 +165,4 @@ mongo.connect(mongoUrl, function(){
     console.log('Server is listening on port: ' + app.get('port'));
   });  
 });
+
