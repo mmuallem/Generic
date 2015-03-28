@@ -1,12 +1,11 @@
 var express = require('express');
 var fs = require('fs');
-var expressSession = require('express-session');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 var mongo = require('./mongo');
+var userModel = require('./schemas/user_schema');
 var mongoose = require('mongoose');
-// var db = require('./mongoose').connect();
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 
@@ -17,8 +16,7 @@ var FACEBOOK_APP_SECRET = '4a671bc3e28583771f379bf785e9dab9';
 var CALLBACK_URL = 'http://localhost/auth/facebook/callback';
 
 
-var mongoUrl = 'mongodb://dpapp01:test123test@ds045021.mongolab.com:45021/dpapp';
-var MongoStore = require('connect-mongo')(expressSession);
+var mongoUrl = 'mongodb://generic01:generic01@ds041140.mongolab.com:41140/generic';
 
 /**********************************************************************************/
 
@@ -27,18 +25,21 @@ var app = express();
 // logger
 app.use(logger('dev'));
 
+// set the default view engine
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+
+
+// Set the default rendering engine for normal html files
+app.engine('html', require('ejs').renderFile);
+
+
 // Use this so we can get access to `req.body` in login ad signup forms.
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // We need to use cookies for sessions, so use the cookie parser middleware
 app.use( require('cookie-parser')() );
 
-app.use( expressSession({
-  secret: 'somesecretrandomstring',
-  store: new MongoStore({
-    url: mongoUrl
-  })
-}));
 
 // handles json parsing
 app.use(bodyParser.json());
@@ -106,8 +107,8 @@ app.get('/search', function(req, res) {
 /**********************************************************************************/
 // handle request for requests when one is logged in
 app.get('/login', function(req, res){
-  getFacebookId('CAATxa5xlQSABACs5ylv29hi5Dddt26SCA24MQwimnj0rPf9Q5pQu5gYxPSyUSwLkYjqUYDm5SsKahv4HhZCztz1qKwxRUKOffT7A8knkQ67elBSRqYfCEsQ0dzSGZBTje6DO7KLwR9V82gCAaThhDvSfKDTz1tgKyKpDYYgjdFfNub4c6JwarLaXY7uDNZBc1u67Byurq1kfvOIqMM5', function(user_id, picture_url) {
-    createUser(user_id, picture_url);
+  getFacebookId('CAATxa5xlQSABACs5ylv29hi5Dddt26SCA24MQwimnj0rPf9Q5pQu5gYxPSyUSwLkYjqUYDm5SsKahv4HhZCztz1qKwxRUKOffT7A8knkQ67elBSRqYfCEsQ0dzSGZBTje6DO7KLwR9V82gCAaThhDvSfKDTz1tgKyKpDYYgjdFfNub4c6JwarLaXY7uDNZBc1u67Byurq1kfvOIqMM5', function(user_name, user_id, picture_url) {
+    createUser(user_name, user_id, picture_url);
   });
   console.log(req.body);
 });
@@ -118,14 +119,22 @@ function getFacebookId(access_token, callback) {
   request('https://graph.facebook.com/me?access_token=' + access_token, function (err, res, body) {
     if(!err && res.statusCode == 200) {
       var obj = JSON.parse(res.body);
-      callback(obj.id, 'https://graph.facebook.com/v2.2/' + obj.id + '/picture');
+      callback(obj.name, obj.id, 'https://graph.facebook.com/v2.2/' + obj.id + '/picture');
     }
   });
 };
 
-function createUser(user_id, picture_url) {
-  //mongoose.createUser(user_id, picture_url, callback());
-  console.log(user_id + ', ' + picture_url);
+function createUser(user_name, user_id, picture_url) {
+  var newUser = new userModel({
+    _id: user_id,
+    name: user_name,
+    imageUrl: picture_url,
+    teamId: null
+  });
+  newUser.save(function (err) {
+    if (err) throw err;
+    console.log('meow');
+  });
 };
 
 /**********************************************************************************/
@@ -148,7 +157,7 @@ app.use(function(err, req, res, next) {
 
 // connect to the database
 // and add a listening port to the applications
-mongo.connect(mongoUrl, function(){
+mongoose.connect(mongoUrl, function(){
   console.log('Connected to mongo at: ' + mongoUrl);
   app.listen(app.get('port'), function(){
     console.log('Server is listening on port: ' + app.get('port'));
