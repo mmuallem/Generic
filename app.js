@@ -7,21 +7,18 @@ var mongo = require('./mongo');
 var userModel = require('./schemas/user_schema');
 var teamModel = require('./schemas/team_schema');
 var mongoose = require('mongoose');
-var passport = require('passport');
-var FacebookStrategy = require('passport-facebook').Strategy;
+var busboy = require('connect-busboy');
+
+var HOST = '115.29.10.169';
+var PORT = '5000';
 
 var request  = require('request');
 
-var FACEBOOK_APP_ID = '1391291127857476';
-var FACEBOOK_APP_SECRET = '4a671bc3e28583771f379bf785e9dab9';
-var CALLBACK_URL = 'http://localhost/auth/facebook/callback';
-
-
 var mongoUrl = 'mongodb://generic01:generic01@ds041140.mongolab.com:41140/generic';
 
-/**********************************************************************************/
-
 var app = express();
+
+/**********************************************************************************/
 
 // logger
 app.use(logger('dev'));
@@ -30,13 +27,11 @@ app.use(logger('dev'));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
-
 // Set the default rendering engine for normal html files
 app.engine('html', require('ejs').renderFile);
 
-
 // Use this so we can get access to `req.body` in login ad signup forms.
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false}));
 
 // We need to use cookies for sessions, so use the cookie parser middleware
 app.use( require('cookie-parser')() );
@@ -47,34 +42,12 @@ app.use(bodyParser.json());
 // parses cookies
 app.use(cookieParser());
 
+app.use(busboy());
+
 // set the port number
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
 
-passport.use(new FacebookStrategy({
-    clientID: FACEBOOK_APP_ID,
-    clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: CALLBACK_URL
-  },
-  function(accessToken, refreshToken, profile, done) {
-    console.log('facebook authenticated successfully');
-  }
-));
-
-/**********************************************************************************/
-
-// Redirect the user to Facebook for authentication.  When complete,
-// Facebook will redirect the user back to the application at
-//     /auth/facebook/callback
-app.get('/auth/facebook', passport.authenticate('facebook'));
-
-// Facebook will redirect the user to this URL after approval.  Finish the
-// authentication process by attempting to obtain an access token.  If
-// access was granted, the user will be logged in.  Otherwise,
-// authentication has failed.
-app.get('/auth/facebook/callback', 
-  passport.authenticate('facebook', { successRedirect: '/',
-                                      failureRedirect: '/login' }));
 
 /**********************************************************************************/
 
@@ -100,7 +73,18 @@ app.get('/create/user', function(req, res) {
   getFacebookId(req.query.access_token, function(user_name, user_id, picture_url) {
     createUser(user_name, user_id, picture_url);
   });
-  res.send('ok');
+
+app.post('/save/image', function(req, res) {
+  var fstream;
+  req.pipe(req.busboy);
+  req.busboy.on('file', function (fieldname, file, filename) {
+      console.log("Uploading: " + filename); 
+      fstream = fs.createWriteStream(__dirname + '/public/images/' + filename);
+      file.pipe(fstream);
+      fstream.on('close', function () {
+          res.json('http://' + HOST + ':' + PORT + '/images/' + filename);
+      });
+  });
 });
 
 //create new team
@@ -244,7 +228,7 @@ app.use(function(err, req, res, next) {
 // and add a listening port to the applications
 mongoose.connect(mongoUrl, function(){
   console.log('Connected to mongo at: ' + mongoUrl);
-  app.listen(app.get('port'), function(){
+  app.listen(app.get('port'), function() {
     console.log('Server is listening on port: ' + app.get('port'));
   });  
 });
