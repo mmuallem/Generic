@@ -4,8 +4,8 @@ var Schema = mongoose.Schema;
 var teamSchema = mongoose.Schema({
 	name: {type: String, required: true, unique: true, index: true},
     imageUrl: Schema.Types.Mixed,
-    userIds: [Number],
-    userRequestsIds: [{type: Schema.Types.ObjectId, ref: 'userSchema'}],
+    userIds: [{type: Number, ref: 'userSchema'}],
+    userRequestsIds: [{type: Number, ref: 'userSchema'}],
     eventIds: [{type: Schema.Types.ObjectId, ref: 'eventSchema'}],
     messages: [{postedBy: {type: Schema.Types.ObjectId},
     			body: String,
