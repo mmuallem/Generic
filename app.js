@@ -138,8 +138,9 @@ app.post('/joinTeam', function(req, res) {
 
 /**********************************************************************************/
 
-app.get('/loginSuccess', function(req, res) {
+app.post('/loginSuccess', function(req, res) {
   console.log('received it!!!');
+  console.log(req.body);
   res.send('200');
 });
 
