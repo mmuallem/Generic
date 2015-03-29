@@ -10,7 +10,7 @@ var eventModel = require('./schemas/event_schema');
 var mongoose = require('mongoose');
 var busboy = require('connect-busboy');
 
-var HOST = '115.29.10.169';
+var HOST = '143.89.227.143';
 var PORT = '5000';
 
 var request  = require('request');
@@ -63,9 +63,15 @@ app.get('/logout', function(req, res){
     res.redirect('/');
 });
 
-app.get('/trigger', function(req, res) {
+app.get('/index', function(req, res) {
   /**********************************************/
-  res.render('searchEvents.html');
+  res.render('index.html');
+  /**********************************************/
+});
+
+app.get('/loggedIn', function(req, res) {
+  /**********************************************/
+  res.render('loggedIn.html');
   /**********************************************/
 });
 
@@ -79,19 +85,28 @@ app.get('/login', function(req, res) {
 });
 
 app.post('/create/team', function(req, res) {
+  var team_name;
+  var user_id;
   var fstream;
   var imageUrl;
+  console.log('here we go');
   req.pipe(req.busboy);
+  req.busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated) {
+    if(fieldname == 'team_name')
+      team_name = val;
+    if(fieldname == 'user_id')
+      user_id = val;
+  });
   req.busboy.on('file', function (fieldname, file, filename) {
       console.log("Uploading: " + filename); 
       fstream = fs.createWriteStream(__dirname + '/public/images/' + filename);
       file.pipe(fstream);
       fstream.on('close', function () {
-          imageUrl = 'http://' + HOST + ':' + PORT + '/images/' + filename;
+        imageUrl = 'http://' + HOST + ':' + PORT + '/images/' + filename;
 
-          createTeam(req.body.team_name.toLowerCase(), req.body.user_id, imageUrl, function(team){
-            res.json(team);
-          });
+        createTeam(team_name.toLowerCase(), user_id, imageUrl, function(team){
+          res.json(team);
+        });
       });
   });
 });
