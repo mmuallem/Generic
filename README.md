@@ -1,7 +1,7 @@
 # DeltaPath Mastermind Game
 
 A browser mastermind game adaptation using words instead of colors. 
-* This application is optimized for PC browsers *
+** This application is optimized for PC browsers **
 
 The application can be accessed [here](http://sleepy-garden-2332.herokuapp.com) or deployed locally.
 
