@@ -1,7 +1,8 @@
 # DeltaPath Mastermind Game
 
 A browser mastermind game adaptation using words instead of colors. 
-** This application is optimized for PC browsers **
+
+**This application is optimized for PC browsers**
 
 The application can be accessed [here](http://sleepy-garden-2332.herokuapp.com) or deployed locally.
 
@@ -23,12 +24,16 @@ A detailed tutorial to do so can be found [here](http://devcenter.heroku.com/art
 ## Run Locally
 
 To deploy this app locally the following software are needed 
-[Node.js](http://nodejs.org/download/)
-[npm](http://www.npmjs.com/) ** Usually this is included in the installation of NodeJs **
-[Heroku Toolbelt](http://toolbelt.heroku.com/)
+- [Node.js](http://nodejs.org/download/)
+- [npm](http://www.npmjs.com/) **Usually this is included in the installation of Node.js**
+- [Heroku Toolbelt](http://toolbelt.heroku.com/)
 
 ```sh
 $ cd deltapath
 $ npm install
 $ node app.js
 ```
+
+
+
+
